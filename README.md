@@ -20,7 +20,7 @@
 
 * **Goal**: Use NLP to identify what words or phrases in a movies description correlate with a higher rating on IMDB
 
-
+------------------------
 
 * Originally wanted to use this [PCPartPicker API](https://pypi.org/project/pcpartpicker/) to gather pc component data and categorize according to budget for a PC build but in practice I found it very hard to gather the data and move it into pandas properly
 
