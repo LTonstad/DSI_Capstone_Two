@@ -19,3 +19,9 @@
  * [Data from Kaggle here](https://www.kaggle.com/sankha1998/tmdb-top-10000-popular-movies-dataset)
 
 * **Goal**: Use NLP to identify what words or phrases in a movies description correlate with a higher rating on IMDB
+
+
+*Other datasets I had considered*
+[Food Images](https://www.kaggle.com/kmader/food41)
+[Brewery Dataset](https://www.kaggle.com/ankurnapa/brewery-dataset?select=beers.csv)
+[Reddit Recipes](https://www.kaggle.com/michau96/recipes-from-reddit?select=Recipes_2.csv)
