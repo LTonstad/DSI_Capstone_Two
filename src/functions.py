@@ -1,4 +1,15 @@
-# Function to get player info from Player class object.def get_player_df(player):
+import numpy as np
+import pandas as pd
+from datetime import datetime
+import requests
+from dateutil import relativedelta
+import sys
+
+from sportsreference.nba.boxscore import Boxscore
+from sportsreference.nba.roster import Roster, Player
+from sportsreference.nba.schedule import Schedule
+from sportsreference.nba.teams import Teams
+
 # helper function to get player age during each season.
 def get_age(year, bd):
     if year[0] == "Career":
@@ -7,7 +18,7 @@ def get_age(year, bd):
         year_dt = datetime(int(year[0][0:4]) + 1, 1, 1)
         age_years = relativedelta(year_dt, bd).years + relativedelta(year_dt, bd).months/12
         return age_years
-        
+    
 # helper function to get year for each row and denote
 # rows that contain career totals.
 def get_year(ix):
@@ -18,20 +29,19 @@ def get_year(ix):
     else:
         return ix[0][0:2] + ix[0][-2:]
 
+# Function to get player info from Player class object.def get_player_df(player):
+
+def get_player_df(player):
     # get player df and add some extra info
     player_df = player.dataframe
     player_df['birth_date'] = player.birth_date
     player_df['player_id'] = player.player_id
     player_df['name'] = player.name
     player_df['year'] = [get_year(ix) for ix in player_df.index]
-    player_df['id'] = [player_id + ' ' + year for player_id,
-                        year in zip(player_df['player_id'],
-                        player_df['year'])]
-    player_df['age'] = [get_age(year, bd) for year,
-                        bd in zip(player_df.index,
-                        player_df['birth_date'])]
+    player_df['id'] = [player_id + ' ' + year for player_id, year in zip(player_df['player_id'], player_df['year'])]
+    player_df['age'] = [get_age(year, bd) for year, bd in zip(player_df.index, player_df['birth_date'])]
     player_df.set_index('id', drop = True, inplace = True)
-
+    
     return player_df
 
 
@@ -85,3 +95,6 @@ for year in range(2020, 1999, -1):
                 # add player to players_collected
                 players_collected.append(player_id)
                 print(player.name)
+
+season_df.to_csv('../data/nba_player_stats_by_season.csv')
+career_df.to_csv('../data/nba_player_stats_by_career.csv')
