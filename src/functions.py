@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 import requests
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 import sys
 
 from sportsreference.nba.boxscore import Boxscore
