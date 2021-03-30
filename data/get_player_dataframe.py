@@ -40,6 +40,25 @@ def get_player_df(player):
     player_df['year'] = [get_year(ix) for ix in player_df.index]
     player_df['id'] = [player_id + ' ' + year for player_id, year in zip(player_df['player_id'], player_df['year'])]
     player_df['age'] = [get_age(year, bd) for year, bd in zip(player_df.index, player_df['birth_date'])]
+    
+    # Stuff I've added
+    years_played = list(filter(lambda x: x != 'Career', player_df.salary.reset_index().iloc[:,0].to_list()))
+    player_df['avg_salary'] = player_df.salary / len(years_played)
+    player_df['years_played'] = len(years_played)
+    player_df['year_list'] = str(years_played)
+    player_df['current_player'] = player_df['year_list'].str.contains('2020-21')
+
+    if (player_df['current_player']).any():
+        salary = player.contract
+        if salary != None:
+            sal_nums = [str(x).replace(',','').replace('$','') for x in list(salary.values())]
+            contract_total = np.sum([int(x) for x in sal_nums])
+            player_df['contract_total'] = contract_total
+            player_df['contract_length'] = len(sal_nums)
+            player_df['current_salary'] = sal_nums[0]
+            player_df['current_avg_salary'] = contract_total / len(sal_nums)
+            player_df['current_team'] = player._team_abbreviation[-2]
+
     player_df.set_index('id', drop = True, inplace = True)
     
     return player_df
@@ -96,5 +115,5 @@ for year in range(2020, 1999, -1):
                 players_collected.append(player_id)
                 print(player.name)
 
-season_df.to_csv('nba_player_stats_by_season.csv')
-career_df.to_csv('nba_player_stats_by_career.csv')
+season_df.to_csv('2nba_player_stats_by_season.csv')
+career_df.to_csv('2nba_player_stats_by_career.csv')
