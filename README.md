@@ -37,7 +37,7 @@ Used functions to create DataFrames from this [Towards DataScience Article](http
 'shooting_fouls', 'shooting_fouls_drawn', 'shots_blocked',
 'take_fouls', 'team_abbreviation', 'three_point_shot_percentage_from_corner',
 'three_pointers_assisted_percentage', 'two_pointers_assisted_percentage',
-'age', 'center_percentage', 'point_guard_percentage',
+'age', 'player_id', 'center_percentage', 'point_guard_percentage',
 'power_forward_percentage', 'shooting_guard_percentage',
 'small_forward_percentage', 'year']
 
@@ -45,14 +45,12 @@ There does appear to be 353 players that have no positions assigned, could try t
 
 ## Notes
 
-* Would like to add the following columns: current_year_salary, current_player(boolean), current_team
+* Would like to add the following columns: ~~current_year_salary, current_player(boolean), current_team~~
 
 * Try to incorporate [TSNE Plot](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html)
 
-* Would be nice to get an age-range while playing
-
 * Some examples found [here](https://thevi5ion.wordpress.com/2017/07/13/classifying-nba-players-using-machine-learning-in-python/)
 
-* Things that I could pull from Players() function:
+* Possible new goal: Train model to predict a players salary this current season based on their current seasons stats, have someone in audience choose player from this season & have model predict then check to verify in their actual contract
 
-  > * id.contract (to get current contract)
+* Using all values was generally a bad idea, was suggesting between 0-2 clusters
