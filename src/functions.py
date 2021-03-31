@@ -12,7 +12,7 @@ from sklearn.decomposition import PCA
 import matplotlib.cm as cm
 import seaborn as sn
 
-from sportsreference.nba.boxscore import Boxscore
+from sportsreference.nba.boxscore import Boxscore, Boxscores
 from sportsreference.nba.roster import Roster, Player
 from sportsreference.nba.schedule import Schedule
 from sportsreference.nba.teams import Teams
@@ -108,6 +108,35 @@ for year in range(2020, 1999, -1):
 
 # season_df.to_csv('../data/nba_player_stats_by_season.csv')
 # career_df.to_csv('../data/nba_player_stats_by_career.csv')
+
+# Get Season Games until now
+def get_current_season():
+    current_season = datetime.strptime("12-22-2020", '%m-%d-%Y')
+    today = datetime.date.today()
+    
+    boxscore = Boxscores(current_season, today)
+
+    d = boxscore.__dict__
+
+    d_cleaned = d['_boxscores']
+    d_cleaned = {k: v for k, v in d.items() if len(v) is not 0}
+
+    d_vals = list(d_cleaned.values())
+
+    from collections import defaultdict
+
+    d = defaultdict(list)
+
+    for outer_lst in d_vals:
+        for i in outer_lst:
+            for k, v in i.items():
+                d[k].append(v)
+    
+    df_boxscore = pd.DataFrame.from_dict(d)
+
+    return df_boxscore
+
+
 
 # Checks for columns that don't have unique values and returns list of columns
 def check_columns(df):
