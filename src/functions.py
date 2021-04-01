@@ -22,29 +22,29 @@ import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
 
 # Get Season Games until now
+
 def get_current_season():
     current_season = datetime.strptime("12-22-2020", '%m-%d-%Y')
-    today = datetime.date.today()
+    yesterday = datetime.now() - timedelta(1)
+    datetime.strftime(yesterday, '%m-%d-%Y')
     
-    boxscore = Boxscores(current_season, today)
+    boxscore = Boxscores(current_season, yesterday)
 
     d = boxscore.__dict__
-
+    
     d_cleaned = d['_boxscores']
-    d_cleaned = {k: v for k, v in d.items() if len(v) is not 0}
-
+    
+    d_cleaned = {k: v for k, v in d_cleaned.items() if len(v) != 0}
     d_vals = list(d_cleaned.values())
 
-    from collections import defaultdict
-
-    d = defaultdict(list)
+    d1 = defaultdict(list)
 
     for outer_lst in d_vals:
         for i in outer_lst:
             for k, v in i.items():
-                d[k].append(v)
+                d1[k].append(v)
     
-    df_boxscore = pd.DataFrame.from_dict(d)
+    df_boxscore = pd.DataFrame.from_dict(d1)
 
     return df_boxscore
 
