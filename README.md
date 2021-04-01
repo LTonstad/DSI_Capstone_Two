@@ -53,4 +53,6 @@ There does appear to be 353 players that have no positions assigned, could try t
 
 * Possible new goal: Train model to predict a players salary this current season based on their current seasons stats, have someone in audience choose player from this season & have model predict then check to verify in their actual contract
 
-* Using all values was generally a bad idea, was suggesting between 0-2 clusters
+* Using all values was generally a bad idea, was suggesting between 2-3 clusters
+
+* Players that are not currently playing do not have contract data, but can find contracts using [spotrac](https://www.spotrac.com/nba/)

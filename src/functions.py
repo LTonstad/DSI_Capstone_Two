@@ -8,6 +8,7 @@ from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.metrics import silhouette_score, silhouette_samples
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import KFold, train_test_split, cross_validate, cross_val_score, permutation_test_score
 from sklearn.decomposition import PCA
 import matplotlib.cm as cm
 import seaborn as sn
@@ -19,95 +20,6 @@ from sportsreference.nba.teams import Teams
 
 import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
-
-# helper function to get player age during each season.
-def get_age(year, bd):
-    if year[0] == "Career":
-        return None
-    else:
-        year_dt = datetime(int(year[0][0:4]) + 1, 1, 1)
-        age_years = relativedelta(year_dt, bd).years + relativedelta(year_dt, bd).months/12
-        return age_years
-    
-# helper function to get year for each row and denote
-# rows that contain career totals.
-def get_year(ix):
-    if ix[0] == "Career":
-        return "Career"
-    elif ix[0] == "1999-00":
-        return "2000"
-    else:
-        return ix[0][0:2] + ix[0][-2:]
-
-# Function to get player info from Player class object.def get_player_df(player):
-
-def get_player_df(player):
-    # get player df and add some extra info
-    player_df = player.dataframe
-    player_df['birth_date'] = player.birth_date
-    player_df['player_id'] = player.player_id
-    player_df['name'] = player.name
-    player_df['year'] = [get_year(ix) for ix in player_df.index]
-    player_df['id'] = [player_id + ' ' + year for player_id, year in zip(player_df['player_id'], player_df['year'])]
-    player_df['age'] = [get_age(year, bd) for year, bd in zip(player_df.index, player_df['birth_date'])]
-    player_df.set_index('id', drop = True, inplace = True)
-    
-    return player_df
-
-
-# initialize a list of players that we have pulled data for
-players_collected = []
-season_df_init = 0
-career_df_init = 0
-season_df = 0
-career_df = 0# iterate through years.
-for year in range(2020, 1999, -1):
-    print('\n' + str(year))
-        
-    # iterate through all teams in that year.
-    for team in Teams(year = str(year)).dataframes.index:
-        print('\n' + team + '\n')
-        
-        # iterate through every player on a team roster.
-        for player_id in Roster(team, year = year,
-                         slim = True).players.keys():
-            
-            # only pull player info if that player hasn't
-            # been pulled already.
-            if player_id not in players_collected:
-                
-                player = Player(player_id)
-                player_info = get_player_df(player)
-                player_seasons = player_info[
-                                 player_info['year'] != "Career"]
-                player_career = player_info[
-                                player_info['year'] == "Career"]
-                
-                # create season_df if not initialized
-                if not season_df_init:
-                    season_df = player_seasons
-                    season_df_init = 1
-                
-                # else concatenate to season_df
-                else:
-                    season_df = pd.concat([season_df,
-                                   player_seasons], axis = 0)
-                    
-                if not career_df_init:
-                    career_df = player_career
-                    career_df_init = 1
-                
-                # else concatenate to career_df
-                else:
-                    career_df = pd.concat([career_df,
-                                   player_career], axis = 0)
-                
-                # add player to players_collected
-                players_collected.append(player_id)
-                print(player.name)
-
-# season_df.to_csv('../data/nba_player_stats_by_season.csv')
-# career_df.to_csv('../data/nba_player_stats_by_career.csv')
 
 # Get Season Games until now
 def get_current_season():
@@ -232,3 +144,185 @@ def plot_d_clusters(d_clusters):
     fig = ax.figure
     fig.set_size_inches(16,10)
     fig.tight_layout(pad=1)
+
+# Pulled from Hands on Machine Learning github
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def relu(z):
+    return np.maximum(0, z)
+
+def derivative(f, z, eps=0.000001):
+    return (f(z + eps) - f(z - eps))/(2 * eps)
+
+
+# Pulled from CrossVal
+
+def my_rmse(y_true, y_pred):
+    mse = ((y_true - y_pred)**2).mean()
+    return np.sqrt(mse)
+
+def my_cross_val_scores(X_data, y_data, num_folds=3):
+    ''' Returns error for k-fold cross validation. '''
+    kf = KFold(n_splits=num_folds)
+    train_error = np.empty(num_folds)
+    test_error = np.empty(num_folds)
+    index = 0
+    reg = KNeighborsRegressor()
+    for train, test in kf.split(X_data):
+        reg.fit(X_data[train], y_data[train])
+        pred_train = reg.predict(X_data[train])
+        pred_test = reg.predict(X_data[test])
+        train_error[index] = my_rmse(pred_train, y_data[train])
+        test_error[index] = my_rmse(pred_test, y_data[test])
+        index += 1
+    return np.mean(test_error), np.mean(train_error)
+
+# Pulled below from Gradient Boosting Regression Solutions
+
+def load_and_split_data():
+    ''' Loads sklearn's boston dataset and splits it into train:test datasets
+        in a ratio of 80:20. Also sets the random_state for reproducible 
+        results each time model is run.
+    
+        Parameters: None
+
+        Returns:  (X_train, X_test, y_train, y_test):  tuple of numpy arrays
+                  column_names: numpy array containing the feature names
+    '''
+    boston = load_boston() #load sklearn's dataset 
+    X, y = boston.data, boston.target
+    column_names = boston.feature_names
+    X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                       test_size = 0.2, 
+                                       random_state = 42)
+    return (X_train, X_test, y_train, y_test), column_names
+
+
+def cross_val(estimator, X_train, y_train, nfolds):
+    ''' Takes an instantiated model (estimator) and returns the average
+        mean square error (mse) and coefficient of determination (r2) from
+        kfold cross-validation.
+
+        Parameters: estimator: model object
+                    X_train: 2d numpy array
+                    y_train: 1d numpy array
+                    nfolds: the number of folds in the kfold cross-validation
+
+        Returns:  mse: average mean_square_error of model over number of folds
+                  r2: average coefficient of determination over number of folds
+    
+        There are many possible values for scoring parameter in cross_val_score.
+        http://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
+
+        kfold is easily parallelizable, so set n_jobs = -1 in cross_val_score
+    '''
+    mse = cross_val_score(estimator, X_train, y_train, 
+                          scoring='neg_mean_squared_error',
+                          cv=nfolds, n_jobs=-1) * -1
+    # mse multiplied by -1 to make positive
+    r2 = cross_val_score(estimator, X_train, y_train, 
+                         scoring='r2', cv=nfolds, n_jobs=-1)
+    mean_mse = mse.mean()
+    mean_r2 = r2.mean()
+    name = estimator.__class__.__name__
+    print("{0:<25s} Train CV | MSE: {1:0.3f} | R2: {2:0.3f}".format(name,
+                                                        mean_mse, mean_r2))
+    return mean_mse, mean_r2
+    
+def stage_score_plot(estimator, X_train, y_train, X_test, y_test):
+    '''
+        Parameters: estimator: GradientBoostingRegressor or AdaBoostRegressor
+                    X_train: 2d numpy array
+                    y_train: 1d numpy array
+                    X_test: 2d numpy array
+                    y_test: 1d numpy array
+
+        Returns: A plot of the number of iterations vs the MSE for the model for
+        both the training set and test set.
+    '''
+    estimator.fit(X_train, y_train)
+    name = estimator.__class__.__name__.replace('Regressor', '')
+    learn_rate = estimator.learning_rate
+    # initialize 
+    train_scores = np.zeros((estimator.n_estimators,), dtype=np.float64)
+    test_scores = np.zeros((estimator.n_estimators,), dtype=np.float64)
+    # Get train score from each boost
+    for i, y_train_pred in enumerate(estimator.staged_predict(X_train)):
+        train_scores[i] = mean_squared_error(y_train, y_train_pred)
+    # Get test score from each boost
+    for i, y_test_pred in enumerate(estimator.staged_predict(X_test)):
+        test_scores[i] = mean_squared_error(y_test, y_test_pred)
+    plt.plot(train_scores, alpha=.5, label="{0} Train - learning rate {1}".format(
+                                                                name, learn_rate))
+    plt.plot(test_scores, alpha=.5, label="{0} Test  - learning rate {1}".format(
+                                                      name, learn_rate), ls='--')
+    plt.title(name, fontsize=16, fontweight='bold')
+    plt.ylabel('MSE', fontsize=14)
+    plt.xlabel('Iterations', fontsize=14)
+
+def rf_score_plot(randforest, X_train, y_train, X_test, y_test):
+    '''
+        Parameters: randforest: RandomForestRegressor
+                    X_train: 2d numpy array
+                    y_train: 1d numpy array
+                    X_test: 2d numpy array
+                    y_test: 1d numpy array
+
+        Returns: The prediction of a random forest regressor on the test set
+    '''
+    randforest.fit(X_train, y_train)
+    y_test_pred = randforest.predict(X_test)
+    test_score = mean_squared_error(y_test, y_test_pred)
+    plt.axhline(test_score, alpha = 0.7, c = 'y', lw=3, ls='-.', label = 
+                                                        'Random Forest Test')
+
+def gridsearch_with_output(estimator, parameter_grid, X_train, y_train):
+    '''
+        Parameters: estimator: the type of model (e.g. RandomForestRegressor())
+                    paramter_grid: dictionary defining the gridsearch parameters
+                    X_train: 2d numpy array
+                    y_train: 1d numpy array
+
+        Returns:  best parameters and model fit with those parameters
+    '''
+    model_gridsearch = GridSearchCV(estimator,
+                                    parameter_grid,
+                                    n_jobs=-1,
+                                    verbose=True,
+                                    scoring='neg_mean_squared_error')
+    model_gridsearch.fit(X_train, y_train)
+    best_params = model_gridsearch.best_params_ 
+    model_best = model_gridsearch.best_estimator_
+    print("\nResult of gridsearch:")
+    print("{0:<20s} | {1:<8s} | {2}".format("Parameter", "Optimal", "Gridsearch values"))
+    print("-" * 55)
+    for param, vals in parameter_grid.items():
+        print("{0:<20s} | {1:<8s} | {2}".format(str(param), 
+                                                str(best_params[param]),
+                                                str(vals)))
+    return best_params, model_best
+
+
+
+def display_default_and_gsearch_model_results(model_default, model_gridsearch, 
+                                              X_test, y_test):
+    '''
+        Parameters: model_default: fit model using initial parameters
+                    model_gridsearch: fit model using parameters from gridsearch
+                    X_test: 2d numpy array
+                    y_test: 1d numpy array
+        Return: None, but prints out mse and r2 for the default and model with
+                gridsearched parameters
+    '''
+    name = model_default.__class__.__name__.replace('Regressor', '') # for printing
+    y_test_pred = model_gridsearch.predict(X_test)
+    mse = mean_squared_error(y_test, y_test_pred)
+    r2 = r2_score(y_test, y_test_pred)
+    print("Results for {0}".format(name))
+    print("Gridsearched model mse: {0:0.3f} | r2: {1:0.3f}".format(mse, r2))
+    y_test_pred = model_default.predict(X_test)
+    mse = mean_squared_error(y_test, y_test_pred)
+    r2 = r2_score(y_test, y_test_pred)
+    print("     Default model mse: {0:0.3f} | r2: {1:0.3f}".format(mse, r2))
