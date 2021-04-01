@@ -41,18 +41,47 @@ Used functions to create DataFrames from this [Towards DataScience Article](http
 'power_forward_percentage', 'shooting_guard_percentage',
 'small_forward_percentage', 'year']
 
-There does appear to be 353 players that have no positions assigned, could try to have it predict the correct positions based on that data?
+### Trying to get an idea of what features contribute to a higher salary
+
+* Showing average salaries over time:
+
+![sal_overtime](images/avg_salaries_overtime.png)
+
+* Features compared to Average Salary:
+
+![scattermat](images/scattermatrix.png)
+
+* Shown another way:
+
+![features](images/feature_correlation.png)
+
+## Linear Regression
+
+* Training:
+
+  > * Mean absolute error = 240457.84
+  > * Mean squared error = 127441167125.65
+  > * Median absolute error = 172839.44
+  > * Explain variance score = 0.42
+  > * R2 score = 0.42
+
+* Residuals plot:
+  * Guess around $42,804.87 most often (median)
+
+![residual plot](images/residuals_train.png)
+
+* Training Plot:
+
+![Training Plot](images/linear_regression.png)
 
 ## Notes
 
 * Would like to add the following columns: ~~current_year_salary, current_player(boolean), current_team~~
 
-* Try to incorporate [TSNE Plot](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html)
-
-* Some examples found [here](https://thevi5ion.wordpress.com/2017/07/13/classifying-nba-players-using-machine-learning-in-python/)
-
-* Possible new goal: Train model to predict a players salary this current season based on their current seasons stats, have someone in audience choose player from this season & have model predict then check to verify in their actual contract
+* new goal: Train model to predict a players salary this current season based on their current seasons stats, have someone in audience choose player from this season & have model predict then check to verify in their actual contract
 
 * Using all values was generally a bad idea, was suggesting between 2-3 clusters
 
 * Players that are not currently playing do not have contract data, but can find contracts using [spotrac](https://www.spotrac.com/nba/)
+
+* [Example](https://www.tensorflow.org/tutorials/keras/regression) for regression problem using neural network
