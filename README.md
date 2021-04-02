@@ -118,7 +118,7 @@ huber had a final val_loss of 219148.109375
 logcosh had a final val_loss of 201331.84375
 ```
 
-* `Log_cosh` ends up slightly edging out the with
+* `Log_cosh` ends up slightly edging out the with it's final val_loss over mae
 
 ![mae](images/mae_network_graph.png)
 
