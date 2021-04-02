@@ -102,6 +102,24 @@
 loss_functions = ['mae', 'mse', 'mape', 'msle', 'huber', 'logcosh']
 ```
 
+* Model features (`first_hidden` is 20% of the numbers of rows in `X_train`):
+
+```python
+def build_and_compile_model(loss):
+  model = keras.Sequential([
+      layers.Dense(first_hidden, activation='relu', input_shape=[X_train.shape[1]]),
+      layers.Dense(first_hidden//4, activation='relu'),
+      layers.Dense(first_hidden//16, activation='relu'),
+      layers.Dense(first_hidden//32, activation='relu'),
+      layers.Dense(first_hidden//64, activation='relu'),
+      layers.Dense(1, activation='linear')
+  ])
+
+  model.compile(loss=loss,optimizer=tf.keras.optimizers.Adam(0.0001),
+                metrics=['mae'])
+  return model
+```
+
 * Results of Training over 500 epochs:
 
 ```python
@@ -123,24 +141,6 @@ logcosh had a final val_loss of 201331.84375
 ![mae](images/mae_network_graph.png)
 
 ![log_cosh](images/logcosh_network_graph.png)
-
-* Model features (`first_hidden` is 20% of the numbers of rows in `X_train`):
-
-```python
-def build_and_compile_model(loss):
-  model = keras.Sequential([
-      layers.Dense(first_hidden, activation='relu', input_shape=[X_train.shape[1]]),
-      layers.Dense(first_hidden//4, activation='relu'),
-      layers.Dense(first_hidden//16, activation='relu'),
-      layers.Dense(first_hidden//32, activation='relu'),
-      layers.Dense(first_hidden//64, activation='relu'),
-      layers.Dense(1, activation='linear')
-  ])
-
-  model.compile(loss=loss,optimizer=tf.keras.optimizers.Adam(0.0001),
-                metrics=['mae'])
-  return model
-```
 
 * In practice it seems that these models consistently predict about `7 times less` than actual for your average player & up to `18 times less` for those outlier players with a **super max** deal
 
