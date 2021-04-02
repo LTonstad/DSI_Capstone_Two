@@ -156,6 +156,16 @@ def relu(z):
 def derivative(f, z, eps=0.000001):
     return (f(z + eps) - f(z - eps))/(2 * eps)
 
+# Pulled from TF Example
+
+def plot_loss(history):
+    plt.plot(history.history['loss'], label='loss')
+    plt.plot(history.history['val_loss'], label='val_loss')
+    plt.ylim([0, 10])
+    plt.xlabel('Epoch')
+    plt.ylabel('Error [avg_salary]')
+    plt.legend()
+    plt.grid(True)
 
 # Pulled from CrossVal
 
