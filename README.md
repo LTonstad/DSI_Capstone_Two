@@ -2,7 +2,9 @@
 # NBA Salary Predictions
 
 * **Goal**: Use different modeling techniques to try and accurately predict what the yearly salary of a player would be based on as many features as possible
-  * **Hidden Goal**  - To be *that guy* when a friend complains that the Bucks overpaid for a player
+  * **Hidden Goal**  - To be *that guy*  that uses advanced Machine Learning models to predict salary worth when a friend complains that the Bucks overpaid for a player
+
+-------------
 
 ## Getting the Data
 
@@ -11,22 +13,27 @@
 
     > * Some strange categories that end with `_percentage` (besides `Field-Goals`) are referring to `{Stat} per 100 possessions`
     > * Features include: `assist_percentage`, `block_percentage`, `defensive_rebound_percentage`, `offensive_rebound_percentage`, `steal_percentage`, `total_rebound_percentage`, `turnover_percentage`, `usage_percentage`
-    > * `Salary` gives career earnings in total, so for the target value I divided the Salary by the amount of years played
+
+-------------
 
 ## Exploratory Data Analysis
 
 * These functions that were partially taken from this [Towards DataScience Article](https://towardsdatascience.com/sports-reference-api-intro-dbce09e89e52) and also modified by myself to get all the info I needed to create created two DataFrames:
   * Season DataFrame (**Mainly used this one**):
 
-    > * 62 Columns (`29 null columns` that were removed)
-    > * 13,235 Rows
+    > * 61 Columns (`29 null columns` that were removed)
+    > * **Target Feature** = `Avg_Salary`
+    > * `Salary` gives career earnings in total up to that season, so for the target value I divided the Salary by the amount of years played at that point
+    > * 13,235 Rows (Season data for players: Vince Carter claims most with 22 years)
     > * 2,033 Unique Players
 
   * Career DataFrame (Used mostly for EDA):
   
-    > * 62 Columns (`29 null columns` that were removed)
+    > * 61 Columns (`29 null columns` that were removed)
     > * 2,040 Rows
     > * 2,033 Unique Players (Down to 1923 players after removing players without salaries)
+
+![salary hist](images/salary_hist.png)
 
 ### Trying to get an idea of what features contribute to a higher salary
 
@@ -42,6 +49,8 @@
 
 ![features](images/feature_correlation.png)
 
+-------------
+
 ## Linear Regression
 
 * Training:
@@ -53,7 +62,7 @@
   > * R2 score = 0.42
 
 * Residuals plot:
-  * Guess around `$42,804.87` most often (median)
+  * Predictions were off by  `$42,804.87` most often (median)
 
 ![residual plot](images/residuals_train.png)
 
@@ -69,8 +78,8 @@
   > * Explain variance score = 0.44
   > * R2 score = 0.44
 
-* Residuals plot:
-  * Guess around `$33,866.78` most often (median)
+* Residuals plot ():
+  * Predictions were off by around `$33,866.78` most often (median)
 
 ![residual test](images/residuals_test.png)
 
@@ -78,12 +87,46 @@
 
 ![Test Plot](images/linear_regression_test.png)
 
+-------------
+
 ## Applying Neural Network to predict Salary of player
+
+* Initially just tried a simple DNN that used 3 Dense `Relu` layers and `msle` as log function, ran over 10,000 epochs, results are shown below:
+
+![Loss Chart](images/log_network_graph.png)
+
+* Then tried running multiple DNN's using the following loss Functions:
+
+```python
+loss_functions = ['mae', 'mse', 'mape', 'msle', 'huber', 'logcosh']
+```
+
+* Results of Training over 500 epochs:
+
+```python
+mae had a final val_loss of 202289.53125
+
+mse had a final val_loss of 142236286976.0 # Squared error: 377,142.26
+
+mape had a final val_loss of 68.57567596435547 # Percentage
+
+msle had a final val_loss of 154.00787353515625 # Log error: 23,718.42
+
+huber had a final val_loss of 219148.109375
+
+logcosh had a final val_loss of 201331.84375
+```
+
+* `Log_cosh` ends up slightly edging out the with
+
+![mae](images/mae_network_graph.png)
+
+![log_cosh](images/logcosh_network_graph.png)
 
 * Model features (`first_hidden` is 20% of the numbers of rows in `X_train`):
 
 ```python
-def build_and_compile_model():
+def build_and_compile_model(loss):
   model = keras.Sequential([
       layers.Dense(first_hidden, activation='relu', input_shape=[X_train.shape[1]]),
       layers.Dense(first_hidden//4, activation='relu'),
@@ -93,27 +136,18 @@ def build_and_compile_model():
       layers.Dense(1, activation='linear')
   ])
 
-  model.compile(loss='msle',optimizer=tf.keras.optimizers.Adam(0.0001),
+  model.compile(loss=loss,optimizer=tf.keras.optimizers.Adam(0.0001),
                 metrics=['mae'])
   return model
 ```
 
-* At First Epoch:
+* In practice it seems that these models consistently predict about `5 times less` than actual, so the output is getting multiplied by `5`
 
-```python
-Epoch 1/10000
-203/203 [==============================] - 2s 8ms/step - loss: 43.6343 - mae: 401974.5262 - val_loss: 9.2513 - val_mae: 372766.1875
-```
+-------------
 
-* All the way here:
+## Who shall we test with?
 
-```python
-
-```
-
-* Loss Chart:
-
-![Loss Chart](images/log_network_graph.png)
+-------------
 
 ## If only I had more time...
 
