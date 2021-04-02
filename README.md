@@ -33,6 +33,9 @@
     > * 2,040 Rows
     > * 2,033 Unique Players (Down to 1923 players after removing players without salaries)
 
+* Highest Paid:   LeBron James         $17.2M
+* Lowest Paid:    Kirk Penney          $4.5K
+
 ![salary hist](images/salary_hist.png)
 
 ### Trying to get an idea of what features contribute to a higher salary
@@ -110,7 +113,7 @@ mse had a final val_loss of 142236286976.0 # Squared error: 377,142.26
 
 mape had a final val_loss of 68.57567596435547 # Percentage
 
-msle had a final val_loss of 154.00787353515625 # Log error: 23,718.42
+msle had a final val_loss of 154.00787353515625 # Log error
 
 huber had a final val_loss of 219148.109375
 
