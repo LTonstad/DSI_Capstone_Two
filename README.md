@@ -144,7 +144,7 @@ def build_and_compile_model(loss):
   return model
 ```
 
-* In practice it seems that these models consistently predict about `5 times less` than actual for your average player & up to `20 times less` for those outlier players with a **super max** deal
+* In practice it seems that these models consistently predict about `7 times less` than actual for your average player & up to `18 times less` for those outlier players with a **super max** deal
 
 -------------
 
