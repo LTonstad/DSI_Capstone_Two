@@ -58,14 +58,13 @@
 
 * Training:
 
-  > * Mean absolute error = 240457.84
+  > * Mean absolute error = 240,457.84
   > * Mean squared error = 127,441,167,125.65
   > * Median absolute error = 172,839.44
   > * Explain variance score = 0.42
   > * R2 score = 0.42
 
 * Residuals plot:
-  * Predictions were off by  `$42,804.87` most often (median)
 
 ![residual plot](images/residuals_train.png)
 
@@ -82,7 +81,6 @@
   > * R2 score = 0.44
 
 * Residuals plot ():
-  * Predictions were off by around `$33,866.78` most often (median)
 
 ![residual test](images/residuals_test.png)
 
@@ -104,28 +102,6 @@
 loss_functions = ['mae', 'mse', 'mape', 'msle', 'huber', 'logcosh']
 ```
 
-* Results of Training over 500 epochs:
-
-```python
-mae had a final val_loss of 202289.53125
-
-mse had a final val_loss of 142236286976.0 # Squared error: 377,142.26
-
-mape had a final val_loss of 68.57567596435547 # Percentage
-
-msle had a final val_loss of 154.00787353515625 # Log error
-
-huber had a final val_loss of 219148.109375
-
-logcosh had a final val_loss of 201331.84375
-```
-
-* `Log_cosh` ends up slightly edging out the with
-
-![mae](images/mae_network_graph.png)
-
-![log_cosh](images/logcosh_network_graph.png)
-
 * Model features (`first_hidden` is 20% of the numbers of rows in `X_train`):
 
 ```python
@@ -144,11 +120,46 @@ def build_and_compile_model(loss):
   return model
 ```
 
-* In practice it seems that these models consistently predict about `5 times less` than actual for your average player & up to `20 times less` for those outlier players with a **super max** deal
+* Results of Training over 500 epochs:
+
+```python
+mae had a final val_loss of 202289.53125
+
+mse had a final val_loss of 142236286976.0 # Squared error: 377,142.26
+
+mape had a final val_loss of 68.57567596435547 # Percentage
+
+msle had a final val_loss of 154.00787353515625 # Log error
+
+huber had a final val_loss of 219148.109375
+
+logcosh had a final val_loss of 201331.84375
+```
+
+* `Log_cosh` ends up slightly edging out the with it's final val_loss over mae
+
+![mae](images/mae_network_graph.png)
+
+![log_cosh](images/logcosh_network_graph.png)
+
+* In practice it seems that these models consistently predict about `7 times less` than actual for your average player & up to `18 times less` for those outlier players with a **super max** deal
 
 -------------
 
 ## Who shall we test with?
+
+-------------
+
+## Conclusions
+
+* Without doing things like **clustering**, identifying **salary limitations** of the team that the player is on and **removing outliers** it's a bit hard to make a super accurate prediction
+* A DNN will make a more accurate prediction than simple linear regression, however for most players it's really not going to make a reasonable difference
+
+## References
+
+* Used functions to create DataFrames from this [Towards DataScience Article](https://towardsdatascience.com/sports-reference-api-intro-dbce09e89e52)
+
+* Players that are not currently playing do not have contract data, but can find contracts using [spotrac](https://www.spotrac.com/nba/)
 
 -------------
 
@@ -163,9 +174,3 @@ def build_and_compile_model(loss):
 * And one of many Horizontal Bar Charts of the most common suggestions of clusters
 
 ![clusters](images/number_of_clusters_standard.png)
-
-## References
-
-* Used functions to create DataFrames from this [Towards DataScience Article](https://towardsdatascience.com/sports-reference-api-intro-dbce09e89e52)
-
-* Players that are not currently playing do not have contract data, but can find contracts using [spotrac](https://www.spotrac.com/nba/)
