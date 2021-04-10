@@ -46,10 +46,6 @@
 
 * Features compared to Average Salary:
 
-![scattermat](images/scattermatrix.png)
-
-* Shown another way:
-
 ![features](images/feature_correlation.png)
 
 -------------
