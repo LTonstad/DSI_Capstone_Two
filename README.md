@@ -1,7 +1,7 @@
 
 # NBA Salary Predictions
 
-* **Goal**: Use different modeling techniques to try and accurately predict what the yearly salary of a player would be based on as many features as possible
+* **Goal**: Use different modeling techniques to try and accurately predict what the yearly salary of a player would be based on as seasonal player stats from the last 20 years
   * **Hidden Goal**  - To be *that guy*  that uses advanced Machine Learning models to predict salary worth when a friend complains that the Bucks overpaid for a player
 
 -------------
