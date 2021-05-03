@@ -21,6 +21,9 @@ from sportsreference.nba.teams import Teams
 import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
 
+-------------------------
+# Getting Data:
+
 # Get Season Games until now
 
 def get_current_season():
@@ -48,7 +51,8 @@ def get_current_season():
 
     return df_boxscore
 
-
+# -------------------------
+# Cleaning Data:
 
 # Checks for columns that don't have unique values and returns list of columns
 def check_columns(df):
@@ -66,6 +70,30 @@ def check_columns(df):
     
     return remove_lst
 
+# Function that finds columns in which values have less than 20 unique values are taken in and removed
+def remove_career_cols(df_career):
+    drop_lst = []
+    for col in df_career.columns:
+        unique = df_career[col].unique()
+        val = len(unique)
+        if val < 20:
+            drop_lst.append(str(col))
+            print(f'{col}: has {val} values')
+            print(f'Values include:')
+            print(f'     {unique}')
+
+    print(f'Drop List: {drop_lst}')
+    return df_career.drop(drop_lst, axis=1)
+
+# Removing non-Salaried Players
+def clean_salaries(df_career):
+    # Dropping players that don't have any recorded salary
+    df_career = df_career.dropna(subset=['salary'])
+    # And players whos salary appeared as $0.0 for some reason
+    df_career = df_career[df_career['salary'] > 0]
+    return df_career
+
+
 # Modifies height to be shown in inches
 def to_inches(height):
     feet, inches = str(height).split('-')
@@ -79,6 +107,31 @@ def normalize(df):
     df_normalized = pd.DataFrame(x_scaled)
 
     return df_normalized
+
+# Creating current/past players DF's & then dropping the columns that only pertain to current players from career_df
+def current_and_past(df_career):
+    df_past_players = df_career[df_career['current_player'] == False]
+    df_current_players = df_career[df_career['current_player'] == True]
+    current_player_features = ['contract_total', 'contract_length', 'current_salary', 'current_avg_salary', 'current_team']
+    df_past_players = df_past_players.drop(current_player_features, axis=1)
+    return df_past_players, df_current_players
+
+# Creating DF that only contains stats that are already averaged
+def just_avgs(df):
+    df_avgs = df[['assist_percentage', 'avg_salary', 'block_percentage', 'box_plus_minus',
+    'defensive_box_plus_minus', 'defensive_rebound_percentage', 'effective_field_goal_percentage',
+    'field_goal_percentage', 'field_goal_perc_sixteen_foot_plus_two_pointers',
+    'field_goal_perc_ten_to_sixteen_feet', 'field_goal_perc_three_to_ten_feet',
+    'field_goal_perc_zero_to_three_feet', 'field_goal_percentage',
+    'free_throw_attempt_rate', 'free_throw_percentage', 'offensive_box_plus_minus',
+    'offensive_rebound_percentage', 'player_efficiency_rating',
+    'three_point_percentage', 'total_rebound_percentage', 'true_shooting_percentage',
+    'turnover_percentage', 'two_point_percentage', 'usage_percentage',
+    'win_shares', 'win_shares_per_48_minutes', 'years_played']]
+    return df_avgs
+
+#  -------------------------
+# Plotting Data:
 
 # Plot PCA graph (x = df_normalized from normalize function) & returns the amount of variance to be explained by this amount of components
 def plot_pca(x):
@@ -101,6 +154,8 @@ def plot_pca(x):
 
     return var_explained
 
+#  -------------------------
+# Clustering Data:
 
 # Return dictionary of amount of times a certain number of clusters had the highest silhouette score
 def find_best_cluster_amount(x, loops):
@@ -145,6 +200,13 @@ def plot_d_clusters(d_clusters):
     fig.set_size_inches(16,10)
     fig.tight_layout(pad=1)
 
+
+
+
+
+
+
+#  -------------------------
 # Pulled from Hands on Machine Learning github
 
 def sigmoid(z):
