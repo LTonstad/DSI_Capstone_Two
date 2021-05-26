@@ -21,8 +21,8 @@ from sportsreference.nba.teams import Teams
 import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
 
--------------------------
-# Getting Data:
+# -------------------------
+# Getting Data
 
 # Get Season Games until now
 
@@ -52,7 +52,11 @@ def get_current_season():
     return df_boxscore
 
 # -------------------------
-# Cleaning Data:
+# Cleaning Data
+
+# Changes number to show in Millions
+def mil_format(x):
+    return "${:.1f}M".format(x/1000000)
 
 # Checks for columns that don't have unique values and returns list of columns
 def check_columns(df):
