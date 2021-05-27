@@ -32,6 +32,8 @@ def get_year(ix):
 # Function to get player info from Player class object.def get_player_df(player):
 
 def get_player_df(player):
+    print(f'Getting player data for {player.name}')
+
     # get player df and add some extra info
     player_df = player.dataframe
     player_df['birth_date'] = player.birth_date
