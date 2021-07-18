@@ -117,5 +117,5 @@ for year in range(2020, 1999, -1):
                 players_collected.append(player_id)
                 print(player.name)
 
-season_df.to_csv('2nba_player_stats_by_season.csv')
-career_df.to_csv('2nba_player_stats_by_career.csv')
+season_df.to_csv('nba_player_stats_by_season.csv')
+career_df.to_csv('nba_player_stats_by_career.csv')

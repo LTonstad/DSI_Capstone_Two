@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+pd.set_option('display.max_columns', None)
+
 from datetime import datetime, timedelta
 from collections import defaultdict
 import itertools
@@ -25,7 +27,7 @@ plt.style.use('fivethirtyeight')
 # -------------------------
 # Getting Data
 
-# Get Season Games until now
+# Get Season Games until now, should look into getting last games date from data for the strptime function
 
 def get_current_season():
     current_season = datetime.strptime("12-22-2020", '%m-%d-%Y')
@@ -50,7 +52,14 @@ def get_current_season():
     
     df_boxscore = pd.DataFrame.from_dict(d1)
 
+    df_boxscore['total_score'] = df_boxscore['away_score'] + df_boxscore['home_score']
+    df_boxscore.set_index('boxscore', inplace=True)
     return df_boxscore
+
+# Function to get all player data for particular season
+def update_players_dataframes(df):
+    
+
 
 # -------------------------
 # Cleaning Data
@@ -76,10 +85,10 @@ def check_columns(df):
     return remove_lst
 
 # Function that finds columns in which values have less than 20 unique values are taken in and removed
-def remove_career_cols(df_career):
+def remove_career_cols(df):
     drop_lst = []
-    for col in df_career.columns:
-        unique = df_career[col].unique()
+    for col in df.columns:
+        unique = df[col].unique()
         val = len(unique)
         if val < 20:
             drop_lst.append(str(col))
@@ -88,15 +97,15 @@ def remove_career_cols(df_career):
             print(f'     {unique}')
 
     print(f'Drop List: {drop_lst}')
-    return df_career.drop(drop_lst, axis=1)
+    return df.drop(drop_lst, axis=1)
 
 # Removing non-Salaried Players
-def clean_salaries(df_career):
+def clean_salaries(df):
     # Dropping players that don't have any recorded salary
-    df_career = df_career.dropna(subset=['salary'])
+    df = df.dropna(subset=['salary'])
     # And players whos salary appeared as $0.0 for some reason
-    df_career = df_career[df_career['salary'] > 0]
-    return df_career
+    df = df[df['salary'] >= 0]
+    return df
 
 
 # Modifies height to be shown in inches
@@ -114,9 +123,9 @@ def normalize(df):
     return df_normalized
 
 # Creating current/past players DF's & then dropping the columns that only pertain to current players from career_df
-def current_and_past(df_career):
-    df_past_players = df_career[df_career['current_player'] == False]
-    df_current_players = df_career[df_career['current_player'] == True]
+def current_and_past(df):
+    df_past_players = df[df['current_player'] == False]
+    df_current_players = df[df['current_player'] == True]
     current_player_features = ['contract_total', 'contract_length', 'current_salary', 'current_avg_salary', 'current_team']
     df_past_players = df_past_players.drop(current_player_features, axis=1)
     return df_past_players, df_current_players

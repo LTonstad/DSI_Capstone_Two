@@ -14,6 +14,8 @@
     > * Some strange categories that end with `_percentage` (besides `Field-Goals`) are referring to `{Stat} per 100 possessions`
     > * Features include: `assist_percentage`, `block_percentage`, `defensive_rebound_percentage`, `offensive_rebound_percentage`, `steal_percentage`, `total_rebound_percentage`, `turnover_percentage`, `usage_percentage`
 
+* Sports Reference API no longer is working (for getting Teams data anyways), might want to look into just connecting with [this dataset](https://www.kaggle.com/wyattowalsh/basketball?select=daily_execution_pipeline.yml) from Wyatt Walsh
+
 -------------
 
 ## Exploratory Data Analysis
