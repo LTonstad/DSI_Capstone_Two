@@ -56,10 +56,6 @@ def get_current_season():
     df_boxscore.set_index('boxscore', inplace=True)
     return df_boxscore
 
-# Function to get all player data for particular season
-def update_players_dataframes(df):
-    
-
 
 # -------------------------
 # Cleaning Data
